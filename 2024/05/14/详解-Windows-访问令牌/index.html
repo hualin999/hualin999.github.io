@@ -21,25 +21,27 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":-1,"unescape":true,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="集中一點, 登峰造極">
-<meta property="og:type" content="website">
-<meta property="og:title" content="L&#39;s Hacker Life !">
-<meta property="og:url" content="http://example.com/index.html">
+    <meta name="description" content="Paper : https:&#x2F;&#x2F;www.exploit-db.com&#x2F;download&#x2F;13054 目的是希望通过学习这篇 Paper 来详细了解关于 Metasploit Incognito 模块 (PEN-300 课程中有相关课程), 以及 Windows 访问令牌机制的原理。 What is Incognito?Incognito 最初是一个独立的应用程序, 允许您在成功入侵系统时模拟用户令">
+<meta property="og:type" content="article">
+<meta property="og:title" content="详解 Windows 访问令牌">
+<meta property="og:url" content="http://example.com/2024/05/14/%E8%AF%A6%E8%A7%A3-Windows-%E8%AE%BF%E9%97%AE%E4%BB%A4%E7%89%8C/index.html">
 <meta property="og:site_name" content="L&#39;s Hacker Life !">
-<meta property="og:description" content="集中一點, 登峰造極">
+<meta property="og:description" content="Paper : https:&#x2F;&#x2F;www.exploit-db.com&#x2F;download&#x2F;13054 目的是希望通过学习这篇 Paper 来详细了解关于 Metasploit Incognito 模块 (PEN-300 课程中有相关课程), 以及 Windows 访问令牌机制的原理。 What is Incognito?Incognito 最初是一个独立的应用程序, 允许您在成功入侵系统时模拟用户令">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-05-14T01:42:53.000Z">
+<meta property="article:modified_time" content="2024-05-14T03:34:20.677Z">
 <meta property="article:author" content="Lei">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://example.com/">
+<link rel="canonical" href="http://example.com/2024/05/14/%E8%AF%A6%E8%A7%A3-Windows-%E8%AE%BF%E9%97%AE%E4%BB%A4%E7%89%8C/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"en","comments":"","permalink":"","path":"index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2024/05/14/%E8%AF%A6%E8%A7%A3-Windows-%E8%AE%BF%E9%97%AE%E4%BB%A4%E7%89%8C/","path":"2024/05/14/详解-Windows-访问令牌/","title":"详解 Windows 访问令牌"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>L's Hacker Life !</title>
+<title>详解 Windows 访问令牌 | L's Hacker Life !</title>
   
 
 
@@ -72,7 +74,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <h1 class="site-title">L's Hacker Life !</h1>
+      <p class="site-title">L's Hacker Life !</p>
       <i class="logo-line"></i>
     </a>
   </div>
@@ -125,7 +127,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           Table of Contents
@@ -138,6 +140,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#What-is-Incognito"><span class="nav-number">1.</span> <span class="nav-text">What is Incognito?</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Windows-%E8%AE%BF%E9%97%AE%E4%BB%A4%E7%89%8C"><span class="nav-number">2.</span> <span class="nav-text">Windows 访问令牌</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Windows-%E8%AE%BF%E9%97%AE%E4%BB%A4%E7%89%8C-%E6%A6%82%E8%BF%B0"><span class="nav-number">3.</span> <span class="nav-text">Windows 访问令牌 : 概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A4%E7%89%8C%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">3.1.</span> <span class="nav-text">令牌的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E4%BB%A4%E7%89%8C"><span class="nav-number">3.2.</span> <span class="nav-text">进程令牌</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E4%BB%A4%E7%89%8C"><span class="nav-number">3.3.</span> <span class="nav-text">线程令牌</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E7%BA%A7%E5%88%AB"><span class="nav-number">3.4.</span> <span class="nav-text">安全级别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-%E2%80%9C%E6%A8%A1%E6%8B%9F%E2%80%9D-%E7%BA%A7%E5%88%AB%E4%BB%A4%E7%89%8C"><span class="nav-number">3.4.1.</span> <span class="nav-text">创建 “模拟” 级别令牌</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-%E2%80%9C%E5%A7%94%E6%B4%BE%E2%80%9D-%E7%BA%A7%E5%88%AB%E4%BB%A4%E7%89%8C"><span class="nav-number">3.4.2.</span> <span class="nav-text">创建 “委派” 级别令牌</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%A4%E7%89%8C%E6%BB%A5%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">令牌滥用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%9F%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87"><span class="nav-number">4.1.</span> <span class="nav-text">域特权提升</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87"><span class="nav-number">4.2.</span> <span class="nav-text">本地特权提升</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E6%89%80%E9%9C%80%E5%B7%A5%E5%85%B7"><span class="nav-number">5.</span> <span class="nav-text">渗透测试所需工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE%E4%BB%A4%E7%89%8C"><span class="nav-number">5.1.</span> <span class="nav-text">枚举令牌</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NtQuerySystemInformation"><span class="nav-number">5.1.1.</span> <span class="nav-text">NtQuerySystemInformation()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E4%BB%A4%E7%89%8C%E4%BF%A1%E6%81%AF"><span class="nav-number">5.1.2.</span> <span class="nav-text">其他令牌信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%BF%9B%E7%A8%8B"><span class="nav-number">5.2.</span> <span class="nav-text">创建进程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%B8%97%E9%80%8F%E5%90%8E%E5%88%A9%E7%94%A8%E4%BB%BB%E5%8A%A1"><span class="nav-number">5.3.</span> <span class="nav-text">其他渗透后利用任务</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -182,16 +185,17 @@
 
     </div>
 
-    <div class="main-inner index posts-expand">
+    <div class="main-inner post posts-expand">
 
-    
+
+  
 
 
 <div class="post-block">
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/05/14/%E8%AF%A6%E8%A7%A3-Windows-%E8%AE%BF%E9%97%AE%E4%BB%A4%E7%89%8C/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -205,13 +209,13 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | L's Hacker Life !">
+      <meta itemprop="name" content="详解 Windows 访问令牌 | L's Hacker Life !">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/05/14/%E8%AF%A6%E8%A7%A3-Windows-%E8%AE%BF%E9%97%AE%E4%BB%A4%E7%89%8C/" class="post-title-link" itemprop="url">详解 Windows 访问令牌</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          详解 Windows 访问令牌
+        </h1>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -249,8 +253,7 @@
     
     
     
-    <div class="post-body" itemprop="articleBody">
-          <p>Paper : <a target="_blank" rel="noopener" href="https://www.exploit-db.com/download/13054">https://www.exploit-db.com/download/13054</a></p>
+    <div class="post-body" itemprop="articleBody"><p>Paper : <a target="_blank" rel="noopener" href="https://www.exploit-db.com/download/13054">https://www.exploit-db.com/download/13054</a></p>
 <p>目的是希望通过学习这篇 Paper 来详细了解关于 Metasploit <code>Incognito</code> 模块 (<code>PEN-300</code> 课程中有相关课程), 以及 Windows 访问令牌机制的原理。</p>
 <h1 id="What-is-Incognito"><a href="#What-is-Incognito" class="headerlink" title="What is Incognito?"></a>What is Incognito?</h1><p><code>Incognito</code> 最初是一个独立的应用程序, 允许您在成功入侵系统时模拟用户令牌。随后被整合进了 Metasploit, 最终融入了 Meterpreter。</p>
 <p>简而言之, 令牌就像网络 Cookie 一样。它们是一种临时密钥, 允许您不需要每次访问文件时都提供凭据的情况下访问系统和网络。<code>Incognito</code> 利用了这一点, 就像 Cookie 窃取一样, 通过在被要求进行身份验证时重放该临时密钥。有两种类型的令牌 : 委派令牌和模拟令牌。委派令牌是为 “交互式” 登录而创建的, 例如登录到计算机或通过远程桌面连接到计算机。模拟令牌用于 “非交互式” 会话, 例如挂载网络驱动器或域登录脚本。令牌的另一个好处是, 它们会持续存在, 直到重新启动。当用户注销时, 他们的委派令牌会报告为模拟令牌, 但仍将保持委派令牌的所有权限。</p>
@@ -334,7 +337,6 @@
 <p>为了使用指定令牌创建新进程, 需要使用 <code>CreateProcessAsUser()</code> API 调用。这允许指定一个令牌句柄, 然后该令牌将作为新创建进程的主令牌。</p>
 <h2 id="其他渗透后利用任务"><a href="#其他渗透后利用任务" class="headerlink" title="其他渗透后利用任务"></a>其他渗透后利用任务</h2><p>大多数其他常见的渗透后利用任务都可以通过模拟令牌然后进行相关的 API 调用来实现。例如, 可能希望模拟一个管理令牌, 然后利用 <code>NetUserAdd()</code> 和 <code>NetGroupAdd()</code> 来添加新用户和管理组成员资格。</p>
 
-      
     </div>
 
     
@@ -342,103 +344,39 @@
     
 
     <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Lei
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="http://example.com/2024/05/14/%E8%AF%A6%E8%A7%A3-Windows-%E8%AE%BF%E9%97%AE%E4%BB%A4%E7%89%8C/" title="详解 Windows 访问令牌">http://example.com/2024/05/14/详解-Windows-访问令牌/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/en" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
 </div>
 
 
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/05/13/OSWP-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Kukulkan.jpg">
-      <meta itemprop="name" content="Lei">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="L's Hacker Life !">
-      <meta itemprop="description" content="集中一點, 登峰造極">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | L's Hacker Life !">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/05/13/OSWP-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1/" class="post-title-link" itemprop="url">OSWP 学习笔记 1</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2024-05-13 09:51:32 / Modified: 16:18:37" itemprop="dateCreated datePublished" datetime="2024-05-13T09:51:32+08:00">2024-05-13</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>6.8k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>25 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          这是一篇加密文章, 需要密码才能继续阅读。
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/05/13/OSWP-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
 
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/05/13/OSWP-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1/" rel="prev" title="OSWP 学习笔记 1">
+                  <i class="fa fa-angle-left"></i> OSWP 学习笔记 1
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
     </footer>
   </article>
 </div>
+
 
 
 
