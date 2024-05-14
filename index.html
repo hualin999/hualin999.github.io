@@ -222,7 +222,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2024-05-14 09:42:53 / Modified: 11:34:20" itemprop="dateCreated datePublished" datetime="2024-05-14T09:42:53+08:00">2024-05-14</time>
+      <time title="Created: 2024-05-14 09:42:53 / Modified: 13:51:52" itemprop="dateCreated datePublished" datetime="2024-05-14T09:42:53+08:00">2024-05-14</time>
     </span>
 
   
@@ -252,88 +252,14 @@
     <div class="post-body" itemprop="articleBody">
           <p>Paper : <a target="_blank" rel="noopener" href="https://www.exploit-db.com/download/13054">https://www.exploit-db.com/download/13054</a></p>
 <p>目的是希望通过学习这篇 Paper 来详细了解关于 Metasploit <code>Incognito</code> 模块 (<code>PEN-300</code> 课程中有相关课程), 以及 Windows 访问令牌机制的原理。</p>
-<h1 id="What-is-Incognito"><a href="#What-is-Incognito" class="headerlink" title="What is Incognito?"></a>What is Incognito?</h1><p><code>Incognito</code> 最初是一个独立的应用程序, 允许您在成功入侵系统时模拟用户令牌。随后被整合进了 Metasploit, 最终融入了 Meterpreter。</p>
-<p>简而言之, 令牌就像网络 Cookie 一样。它们是一种临时密钥, 允许您不需要每次访问文件时都提供凭据的情况下访问系统和网络。<code>Incognito</code> 利用了这一点, 就像 Cookie 窃取一样, 通过在被要求进行身份验证时重放该临时密钥。有两种类型的令牌 : 委派令牌和模拟令牌。委派令牌是为 “交互式” 登录而创建的, 例如登录到计算机或通过远程桌面连接到计算机。模拟令牌用于 “非交互式” 会话, 例如挂载网络驱动器或域登录脚本。令牌的另一个好处是, 它们会持续存在, 直到重新启动。当用户注销时, 他们的委派令牌会报告为模拟令牌, 但仍将保持委派令牌的所有权限。</p>
-<p>提示 : 文件服务器是令牌的虚拟宝库, 因为大多数文件服务器都是通过域登录脚本用作网络附加驱动器。</p>
-<p>一旦您拥有了 Meterpreter 会话, 您就可以在系统上模拟有效的令牌, 并成为该特定用户, 而无需担心凭据, 甚至哈希值。在渗透测试期间, 这尤其有用, 因为令牌有可能允许本地和&#x2F;或域特权提升, 使您能够通过潜在提升权限的替代途径访问多个系统。</p>
-<h1 id="Windows-访问令牌"><a href="#Windows-访问令牌" class="headerlink" title="Windows 访问令牌"></a>Windows 访问令牌</h1><p>Windows 访问令牌可以用于强大的后渗透利用任务, 但在这个上下文中之前并没有得到充分讨论。传递哈希技术多年来一直在讨论中, 就实际利用问题产生的代码而言, 其成功程度不一; 然而, 这些讨论都没有涵盖问题的全部范围。因此, 访问令牌可能代表的潜在安全风险并没有被系统架构师, 网络管理员和其他涉及安全和管理的人充分认识到, 因此缓解控制措施没有得到应有的重视。</p>
-<p>导致这个问题没有得到足够安全关注的另一个潜在原因是因为对策主要是程序性的, 这比简单地应用补丁要困难得多。MWR InfoSecurity 观察到的许多安全实践可能会使组织容易受到基于滥用 Windows 访问令牌的攻击的影响。</p>
-<h1 id="Windows-访问令牌-概述"><a href="#Windows-访问令牌-概述" class="headerlink" title="Windows 访问令牌 : 概述"></a>Windows 访问令牌 : 概述</h1><p>Windows 访问令牌是微软的身份验证, 访问控制和单一登录 (Single Sign-On, SSO) 模型的组成部分, 由本地安全性权威子系统服务 (Local Security Authority Subsystem Service, LSASS) 创建和管理。然而, 一般来说, 系统设计师和管理员似乎没有像在基于 UNIX 的操作系统中那样充分理解它们的对等物, 即用户和组 ID。这主要有两个原因 :</p>
-<ul>
-<li><p>访问令牌和一般的 Windows 访问控制模型比 UNIX 模型复杂得多。</p>
-</li>
-<li><p>Windows 倾向于隐藏实现细节。在 UNIX 系统上, 访问控制模型通常更加公开, 了解它是学习使用 UNIX 的关键。</p>
-</li>
-</ul>
-<p>虽然对访问令牌和 Windows 访问控制模型的完整描述超出了本文档的范围, 但下面讨论了一个简单的概述, 应该足以自给自足地理解本文后面讨论的问题。</p>
-<h2 id="令牌的作用"><a href="#令牌的作用" class="headerlink" title="令牌的作用"></a>令牌的作用</h2><p>访问令牌主要负责描述进程或线程的安全上下文。这包括相关的用户, 组和特权。基于这些信息, Windows 内核可以根据进程请求的特权操作做出访问控制决策。令牌通常与特定的进程或线程关联, 并且是内核对象。在用户空间, 它们通过句柄来唯一标识。</p>
-<h2 id="进程令牌"><a href="#进程令牌" class="headerlink" title="进程令牌"></a>进程令牌</h2><p>有两种主要类型的令牌 : 主令牌和模拟令牌。在 Windows 中, 所有进程都有一个与之关联的主令牌, 这些令牌决定了相关进程的特权。当创建新进程时, 默认操作是让子进程继承与其父进程关联的主令牌。</p>
-<h2 id="线程令牌"><a href="#线程令牌" class="headerlink" title="线程令牌"></a>线程令牌</h2><p>Windows 是一个多线程操作系统, 一个进程总是至少有一个关联的线程。默认情况下, 线程将在与其父进程相同的安全上下文下运行, 利用主令牌。然而, Windows 还使用了模拟的概念, 允许一个线程在获得不同的访问令牌时临时模拟不同的安全上下文, 通常使用模拟令牌来实现这一点。</p>
-<p>这种功能的最常见用途是允许应用程序开发人员让 Windows 内核处理大部分访问控制。例如, 考虑一个作为服务帐户运行的 FTP 服务器。如果没有模拟, 服务器将不得不通过比较客户端关联的用户名和组以及文件和目录上存在的 ACL 来手动执行文件的访问控制。模拟允许将所有这些工作交给 Windows 内核来完成, 确保服务线程在客户端用户帐户的安全上下文下执行。这可以被视为 UNIX <code>setuid()</code> 函数族的 Windows 类比。</p>
-<p>一些常用的实现这一功能的 API 调用如下 : </p>
-<ul>
-<li><p><code>ImpersonateLoggedOnUser()</code> - 允许调用线程模拟所提供令牌的安全上下文</p>
-</li>
-<li><p><code>ImpersonateNamedPipeClient()</code> - 允许调用线程模拟已连接到命名管道的客户端的安全上下文</p>
-</li>
-<li><p><code>RevertToSelf()</code> - 允许调用线程将其安全上下文恢复为其父进程关联的主令牌的安全上下文</p>
-</li>
-</ul>
-<h2 id="安全级别"><a href="#安全级别" class="headerlink" title="安全级别"></a>安全级别</h2><p>令牌与不同的安全级别相关联, 这进一步确定了给定令牌所代表的特权级别。一个令牌可以具有四种安全级别之一 : </p>
-<ul>
-<li><p>匿名</p>
-</li>
-<li><p>标识</p>
-</li>
-<li><p>模拟</p>
-</li>
-<li><p>委派</p>
-</li>
-</ul>
-<p>具有最重要安全影响的安全级别是模拟和委派, 因为它们可以用于假定不同的安全上下文; 匿名和标识没有这种能力, 因此在这里不讨论。模拟级别允许线程模拟本地系统上令牌的安全上下文, 但不允许使用该令牌访问外部系统。然而, 委派级别允许线程模拟任何系统上令牌的安全上下文, 因为它存储了相关的身份验证凭据。通过访问令牌暴露的大部分风险是委派令牌的结果; 然而, 将展示在某些情况下模拟令牌也可能引入安全风险。</p>
-<h3 id="创建-“模拟”-级别令牌"><a href="#创建-“模拟”-级别令牌" class="headerlink" title="创建 “模拟” 级别令牌"></a>创建 “模拟” 级别令牌</h3><p>这些令牌通常是作为非交互式登录的结果创建的。一个常见的例子是之前提到的 FTP 服务器的示例。</p>
-<h3 id="创建-“委派”-级别令牌"><a href="#创建-“委派”-级别令牌" class="headerlink" title="创建 “委派” 级别令牌"></a>创建 “委派” 级别令牌</h3><p>这些令牌通常是作为交互式登录的结果创建的。其中的例子包括传统登录控制台, 使用终端服务远程登录或使用其他远程访问解决方案, 比如 Citrix。</p>
-<p>还有一些情况下, 非交互式登录也可能导致创建这些令牌。一般来说, 这是当计算机或用户帐户被信任用于委派时发生的。一个例子是配置为使用加密文件系统 (EFS) 的远程文件服务器。EFS 需要访问用户的身份验证凭据才能解密文件。因此, 通过映射的网络共享进行非交互式登录需要访问委派令牌才能正常工作。因此, 在这种情况下, EFS 文件服务器通常会被信任用于委派。</p>
-<h1 id="令牌滥用"><a href="#令牌滥用" class="headerlink" title="令牌滥用"></a>令牌滥用</h1><p>在系统的正常运行过程中, 根据服务器的功能和当前的使用环境, 可能会存在各种类型的令牌。如果系统被入侵, 那么可能可以通过利用这些令牌实现某种形式的特权提升, 具体取决于已经获取到系统的访问级别。这种提升通常可以分为两种主要形式 : 域特权提升和本地特权提升。</p>
-<h2 id="域特权提升"><a href="#域特权提升" class="headerlink" title="域特权提升"></a>域特权提升</h2><p>域特权提升指的是利用委派令牌访问其他系统的能力, 这些系统可能本来是免受直接攻击的。这是可能的, 因为委派令牌包含身份验证凭据, 因此可以用于访问这些凭据有效的外部系统。</p>
-<p>要执行这种类型的攻击, 通常需要在受损系统上拥有管理员特权。这是因为模拟令牌需要 “<code>SeImpersonate</code>“ 特权, 截至 Windows XP SP2, Windows 2003 和 Windows 2000 SP4; 此外, 委派令牌通常是交互式登录的结果, 因此需要管理员访问权限才能访问系统上所有用户进程中存在的令牌。根据执行的具体渗透后利用任务, 可能还需要其他特权 (如 “<code>SeAssignPrimaryTokenPrivilege</code>“ 和 “<code>SeCreateTokenPrivilege</code>“)。</p>
-<p>然而, 也有一些例外情况。例如, 如果攻击者成功入侵了一个被信任进行委派的服务帐户, 那么他们可能能够执行这种攻击, 因为服务通常具有 “<code>SeImpersonate</code>“ 特权。此外, 在 “<code>SeImpersonate</code>“ 引入之前的系统上, 在某些情况下, 可能会从低特权用户帐户执行这种攻击。</p>
-<p>这种攻击类型的一个典型用例是作为入侵关键数据库服务器的一部分。如果攻击者无法直接入侵数据库服务器, 那么他们可以转而攻击数据库管理员的工作站, 因为他们的用户帐户通常具有对数据库服务器本身的合法访问权限。如果他们成功入侵了工作站, 那么他们就可以使用现有的令牌访问数据库服务器。</p>
-<h2 id="本地特权提升"><a href="#本地特权提升" class="headerlink" title="本地特权提升"></a>本地特权提升</h2><p>在某些情况下, 令牌可以导致本地特权提升。如果攻击者入侵了一个低特权的服务, 则最有可能发生这种情况。允许客户端通过 Windows 身份验证连接的服务通常会获得用于客户端的模拟令牌。通常, 服务于客户端的线程会使用该令牌来模拟客户端的安全上下文。如果连接的客户端是管理员, 那么攻击者可以使用这个令牌来提升其在系统上的特权, 以获取管理员访问权限。</p>
-<p>一个典型的例子是, 如果攻击者入侵了一个以低特权服务帐户身份运行的 Microsoft SQL Server 实例。如果一个作为系统本地管理员的数据库管理员通过 Windows 身份验证连接到 SQL Server, 那么攻击者可以使用他的令牌来获取对服务器的管理员控制。这是因为他的令牌将保存在 SQL Server 的进程地址空间中。</p>
-<p>另一个例子是, 如果攻击者入侵了一个以 “<code>NETWORK SERVICE</code>“ 内置服务帐户身份运行的服务器。与 “<code>SYSTEM</code>“ 帐户相比, 这个帐户的权限较低, 以帮助提供对某些攻击类别的深度防御, 特别是那些不允许直接代码执行的攻击。然而, 如果能够在这个帐户的安全上下文下执行任意代码, 那么就可以提升特权至 “<code>SYSTEM</code>“ , 因为它可以访问 “<code>SYSTEM</code>“ 模拟令牌。</p>
-<h1 id="渗透测试所需工具"><a href="#渗透测试所需工具" class="headerlink" title="渗透测试所需工具"></a>渗透测试所需工具</h1><p>考虑到使用 Windows 访问令牌引入的重要安全影响, 有必要将评估和利用与任何与令牌相关的安全问题相结合, 纳入到渗透测试方法论中。</p>
-<p>为了在渗透测试中评估这些问题, 有必要拥有适用于调查和利用受损系统上存在的令牌的通用工具。这种工具需要具备以下主要功能 :</p>
-<ul>
-<li><p>枚举受损系统上的令牌</p>
-</li>
-<li><p>这些令牌是否可以从当前安全上下文访问</p>
-</li>
-<li><p>每个令牌关联的安全级别是什么</p>
-</li>
-<li><p>与每个令牌关联的用户帐户和组是什么</p>
-</li>
-<li><p>模拟令牌并使用它们执行常见的渗透后利用任务</p>
-</li>
-<li><p>执行进程</p>
-</li>
-<li><p>管理用户, 组</p>
-</li>
-<li><p>提取 LANMAN&#x2F;NTLM 散列值</p>
-</li>
-<li><p>其他常见的渗透后利用任务</p>
-</li>
-</ul>
-<h2 id="枚举令牌"><a href="#枚举令牌" class="headerlink" title="枚举令牌"></a>枚举令牌</h2><p>令牌本质上是内核数据结构。从用户空间, 令牌通过句柄进行引用。然后, 可以将这些句柄传递给相关的 Windows API 调用, 以对所需的令牌进行操作。枚举系统上所有令牌的最全面方法是枚举系统上的所有句柄, 然后确定哪些句柄表示令牌。为了做到这一点, 需要利用由 <code>ntdll.dll</code> 导出的底层 API 调用。</p>
-<h3 id="NtQuerySystemInformation"><a href="#NtQuerySystemInformation" class="headerlink" title="NtQuerySystemInformation()"></a>NtQuerySystemInformation()</h3><p><code>NtQuerySystemInformation()</code> API 调用可用于查询大量的系统信息。以下是该函数的原型 : </p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">__kernel_entry NTSTATUS NtQuerySystemInformation(</span><br><span class="line">  [in]            SYSTEM_INFORMATION_CLASS SystemInformationClass,</span><br><span class="line">  [in, out]       PVOID                    SystemInformation,</span><br><span class="line">  [in]            ULONG                    SystemInformationLength,</span><br><span class="line">  [out, optional] PULONG                   ReturnLength</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<p>通过指定 <code>SYSTEM_INFORMATION_CLASS</code> 为 “<code>SystemHandleInformation</code>“ (数值为 <code>16</code>), 可以检索有关当前系统上所有句柄的信息。</p>
-<h3 id="其他令牌信息"><a href="#其他令牌信息" class="headerlink" title="其他令牌信息"></a>其他令牌信息</h3><p>为了确定与令牌相关的其他重要信息, 如安全级别, 用户, 组等, 枚举的令牌句柄然后可以提供给更传统的 API 调用, 如 <code>GetTokenInformation()</code>, <code>LookedupAccountSid()</code> 等。</p>
-<h2 id="创建进程"><a href="#创建进程" class="headerlink" title="创建进程"></a>创建进程</h2><p>一个常见的后渗透利用技术是使用在受损系统上找到的指定令牌创建一个新进程。通常, 在 Windows 上创建新进程时需要使用 <code>CreateProcess()</code> API 调用。然而, 当在不同令牌的上下文中创建新进程时, 仅仅模拟令牌并调用 <code>CreateProcess()</code> 是不够的。这是因为, 默认情况下, <code>CreateProcess()</code> 会使用父进程的主令牌而不是调用线程的当前令牌来创建新进程。</p>
-<p>为了使用指定令牌创建新进程, 需要使用 <code>CreateProcessAsUser()</code> API 调用。这允许指定一个令牌句柄, 然后该令牌将作为新创建进程的主令牌。</p>
-<h2 id="其他渗透后利用任务"><a href="#其他渗透后利用任务" class="headerlink" title="其他渗透后利用任务"></a>其他渗透后利用任务</h2><p>大多数其他常见的渗透后利用任务都可以通过模拟令牌然后进行相关的 API 调用来实现。例如, 可能希望模拟一个管理令牌, 然后利用 <code>NetUserAdd()</code> 和 <code>NetGroupAdd()</code> 来添加新用户和管理组成员资格。</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/05/14/%E8%AF%A6%E8%A7%A3-Windows-%E8%AE%BF%E9%97%AE%E4%BB%A4%E7%89%8C/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 

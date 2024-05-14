@@ -21,15 +21,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":-1,"unescape":true,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="Paper : https:&#x2F;&#x2F;www.exploit-db.com&#x2F;download&#x2F;13054 目的是希望通过学习这篇 Paper 来详细了解关于 Metasploit Incognito 模块 (PEN-300 课程中有相关课程), 以及 Windows 访问令牌机制的原理。 What is Incognito?Incognito 最初是一个独立的应用程序, 允许您在成功入侵系统时模拟用户令">
+    <meta name="description" content="Paper : https:&#x2F;&#x2F;www.exploit-db.com&#x2F;download&#x2F;13054 目的是希望通过学习这篇 Paper 来详细了解关于 Metasploit Incognito 模块 (PEN-300 课程中有相关课程), 以及 Windows 访问令牌机制的原理。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="详解 Windows 访问令牌">
 <meta property="og:url" content="http://example.com/2024/05/14/%E8%AF%A6%E8%A7%A3-Windows-%E8%AE%BF%E9%97%AE%E4%BB%A4%E7%89%8C/index.html">
 <meta property="og:site_name" content="L&#39;s Hacker Life !">
-<meta property="og:description" content="Paper : https:&#x2F;&#x2F;www.exploit-db.com&#x2F;download&#x2F;13054 目的是希望通过学习这篇 Paper 来详细了解关于 Metasploit Incognito 模块 (PEN-300 课程中有相关课程), 以及 Windows 访问令牌机制的原理。 What is Incognito?Incognito 最初是一个独立的应用程序, 允许您在成功入侵系统时模拟用户令">
+<meta property="og:description" content="Paper : https:&#x2F;&#x2F;www.exploit-db.com&#x2F;download&#x2F;13054 目的是希望通过学习这篇 Paper 来详细了解关于 Metasploit Incognito 模块 (PEN-300 课程中有相关课程), 以及 Windows 访问令牌机制的原理。">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2024-05-14T01:42:53.000Z">
-<meta property="article:modified_time" content="2024-05-14T03:34:20.677Z">
+<meta property="article:modified_time" content="2024-05-14T05:51:52.193Z">
 <meta property="article:author" content="Lei">
 <meta name="twitter:card" content="summary">
 
@@ -226,7 +226,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2024-05-14 09:42:53 / Modified: 11:34:20" itemprop="dateCreated datePublished" datetime="2024-05-14T09:42:53+08:00">2024-05-14</time>
+      <time title="Created: 2024-05-14 09:42:53 / Modified: 13:51:52" itemprop="dateCreated datePublished" datetime="2024-05-14T09:42:53+08:00">2024-05-14</time>
     </span>
 
   
@@ -255,6 +255,8 @@
     
     <div class="post-body" itemprop="articleBody"><p>Paper : <a target="_blank" rel="noopener" href="https://www.exploit-db.com/download/13054">https://www.exploit-db.com/download/13054</a></p>
 <p>目的是希望通过学习这篇 Paper 来详细了解关于 Metasploit <code>Incognito</code> 模块 (<code>PEN-300</code> 课程中有相关课程), 以及 Windows 访问令牌机制的原理。</p>
+<span id="more"></span>
+
 <h1 id="What-is-Incognito"><a href="#What-is-Incognito" class="headerlink" title="What is Incognito?"></a>What is Incognito?</h1><p><code>Incognito</code> 最初是一个独立的应用程序, 允许您在成功入侵系统时模拟用户令牌。随后被整合进了 Metasploit, 最终融入了 Meterpreter。</p>
 <p>简而言之, 令牌就像网络 Cookie 一样。它们是一种临时密钥, 允许您不需要每次访问文件时都提供凭据的情况下访问系统和网络。<code>Incognito</code> 利用了这一点, 就像 Cookie 窃取一样, 通过在被要求进行身份验证时重放该临时密钥。有两种类型的令牌 : 委派令牌和模拟令牌。委派令牌是为 “交互式” 登录而创建的, 例如登录到计算机或通过远程桌面连接到计算机。模拟令牌用于 “非交互式” 会话, 例如挂载网络驱动器或域登录脚本。令牌的另一个好处是, 它们会持续存在, 直到重新启动。当用户注销时, 他们的委派令牌会报告为模拟令牌, 但仍将保持委派令牌的所有权限。</p>
 <p>提示 : 文件服务器是令牌的虚拟宝库, 因为大多数文件服务器都是通过域登录脚本用作网络附加驱动器。</p>
