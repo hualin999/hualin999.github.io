@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.2.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.css" integrity="sha256-gkQVf8UKZgQ0HyuxL/VnacadJ+D2Kox2TCEBuNQg5+w=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"always","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":-1,"unescape":true,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="这是一篇加密文章, 需要密码才能继续阅读。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OSWE 学习笔记 4 - Bassmaster NodeJS Arbitrary JavaScript Injection Vulnerability">
+<meta property="og:url" content="http://example.com/2024/06/18/OSWE-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-4/index.html">
+<meta property="og:site_name" content="L&#39;s Hacker Life !">
+<meta property="og:description" content="这是一篇加密文章, 需要密码才能继续阅读。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-06-18T14:55:16.000Z">
+<meta property="article:modified_time" content="2024-06-18T15:18:26.968Z">
+<meta property="article:author" content="Lei">
+<meta property="article:tag" content="private">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2024/06/18/OSWE-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-4/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2024/06/18/OSWE-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-4/","path":"2024/06/18/OSWE-学习笔记-4/","title":"OSWE 学习笔记 4 - Bassmaster NodeJS Arbitrary JavaScript Injection Vulnerability"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>OSWE 学习笔记 4 - Bassmaster NodeJS Arbitrary JavaScript Injection Vulnerability | L's Hacker Life !</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">L's Hacker Life !</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="Searching..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div id="toc-div" style="display:none">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Bassmaster-NodeJS-Arbitrary-JavaScript-Injection-Vulnerability"><span class="nav-number">1.</span> <span class="nav-text">Bassmaster NodeJS Arbitrary JavaScript Injection Vulnerability</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Getting-Started"><span class="nav-number">2.</span> <span class="nav-text">Getting Started</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#The-Bassmaster-Plugin"><span class="nav-number">3.</span> <span class="nav-text">The Bassmaster Plugin</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Vulnerability-Discovery"><span class="nav-number">4.</span> <span class="nav-text">Vulnerability Discovery</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lei"
+      src="/images/Kukulkan.jpg">
+  <p class="site-author-name" itemprop="name">Lei</p>
+  <div class="site-description" itemprop="description">集中一點, 登峰造極</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="mailto:huanglei@cstc.org.cn" title="E-Mail → mailto:huanglei@cstc.org.cn" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="Back to top">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          Links
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="https://sinkboat.top/" title="https:&#x2F;&#x2F;sinkboat.top" rel="noopener" target="_blank">Title</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/06/18/OSWE-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Kukulkan.jpg">
+      <meta itemprop="name" content="Lei">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="L's Hacker Life !">
+      <meta itemprop="description" content="集中一點, 登峰造極">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="OSWE 学习笔记 4 - Bassmaster NodeJS Arbitrary JavaScript Injection Vulnerability | L's Hacker Life !">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OSWE 学习笔记 4 - Bassmaster NodeJS Arbitrary JavaScript Injection Vulnerability
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2024-06-18 22:55:16 / Modified: 23:18:26" itemprop="dateCreated datePublished" datetime="2024-06-18T22:55:16+08:00">2024-06-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/OSWE-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">OSWE 学习笔记</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>563</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>2 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="抱歉, 您输入的密码错误, 请检查后重新输入 !" data-whm="抱歉, 当前文章不能被校验, 不过您还是可以看看解密后的内容。">
+  <script id="hbeData" type="hbeData" data-hmacdigest="bb99cc15b3237548e80853e83bcc2dcb15dc8ed5500199f2714dff5eef510942">d0732a6c3cda67378be25ffb83735163524ffdfcbb2ad8d421e17a0272dbc64aa04aa24e4d9e4c12ec46804c80d9e1938c9fba992de21a87dffadf8536ce9e19e87f69b4d5d69af3ad6c40aebd4c3a89f114bba2aba36682f5b9519073cb025471f619b9cfb607bd3a7a8b9937700c496d165ccb52411e596914e2032bb0f66e7e8f172bd08a2d97663e55697a56ef140ad237d3b21e907221d9a55291f8de618f1f8a61f74ca47dd1d5bf822345299ce1f9e8f0b6d041b3e797d5cd49f3fbf88d4bbb9a1b8e38f7ba77d0090812e9b750ba218a0bd0053496ac64acabf793e65c49069fa7164a77995f2ce7ce4c1c8d8bb6cfa2ed866834082e8bb77e379f4ad24a9dcb5163d8e41e4cdce3a20643ec4234f405be08ed96f28809bdbd7dd5d8a822b92d8a4a171e53c9d89e947d727c329c1ab744b555d297b159c4b968290e91a83b9a1be9c001360089aef4567591284b52e6445ada2f0ba59b779e9b4f0c74c2e7632004dd4c6077ab46f938a0252b577e99c9caeb4a96fe73ab07dccd9fb1c8ffb0a94ab44d2a9fcc054c9748399cc7de6a90be81935b487a2c275b09cc2acdc4b1451dece08dfbf6b22b5c17ec40134154ccb80a6342abec9d485016c285b5f778702393daa104d5159dd4038ffde796bb71306997190f38be405f38c76706457c53ed3b2803d19a9dc1f4841321416ea837f1eae11cece91600d733a83b59671092a711e7803a988624f6e30d95a8674e862b5a5581c127019dd234b57b7173df41d54c7bc245c493bf6157b7fac01ce51562b644ec5da43a11698786bd63aab8ec6ddb31ce907c248fce1c4a8b679cff78919b4361a62e14e63506636a567eb676aaad49567b5f20b277415fe4f74145c0d7e5c30fa500b8ee324abf1dcb84aee84ffc051d187eea64a9d2df92c44d7788d4b040b63e7fe5107bceb85293fdc27be5238dffa27970d492ff886856c4f3aea6739645b03dde1f4cc3a95225c333a02e0181b59c5a6385fe70d348a608c3d096b81c8d478ecd9692bd13fea32812c5f3d96effe50d27f28ee2b4f94c7a09f4c999d046efe2c6ee726f43ad1defe664df954d83ed7b321a5d6eda2b91aaafa45d6e6f6046ed83ac54f49fd037135fbece66ebd49fbcad529e0d38628ea25bef573cece5caafe1f297dfe4e9e37865bc8381acfc27e64514e89a8a1d972d85837ebb5f4f60d6724cfc111973d5dfd64e4fe492e9b490ac14de3b3d8baa9469a58ec7dfc1e13762959d624f43aacdafd886ecd33d43c0338ff6c1184c9b4b0236ec8c2c09ca2549b4ac14ef9cc237699ccd7dedf7106a4d643c9b197c96f6140204ae77a7611bad8af1e5cf2a3616db0e2477fea5d62d7ffefe982f944599783e99df07151b1e7585b98e85dfbc6c3bd352b3c9e1e19f4baf573c6b9d5f4efb7b820246cb216993f6cf31cd40d1cc85a955ef662276999437c1ea2b0d465967eac63b41801006375d5ce4a7a5040383e73a9a1e81fa031b38e6f538fa895253ba8482fd06c39ee1223bc5ec82779963ef73786a467d1b71d49f8feaa03a18885494a3e48cd517a8200033981f1d1bcf44eb179e66b7322e2c8330166856b25e9fa497aaeeefcade9f1fa157f46a7bfe973cc3da83978ff441e8b1474a920dde5f2035f45977a772c25ea24ac4e1c4020ab5f9938948f460ae2a512d3a213db519e313087f39542451a67bfb7467515e99f7a1fc54e1ea82411e5183c9e1ee62de69ded41a10100601e0d6e85d82dbc2b7c25648755719e5c37574d523f0818608d96ce557b93610a277c42179dee2bc46d316269fa6a787a42ca5097bbc62e3e58fec9b1f648d08660037c52d0df815154756334b6b5194e608b1e7cf3fa1d5eb1e99500b6bd10717b1c6adc0eff7043ae5c9f94fa4d3489b85306887d5e824f3b174011ee0c962ff051f2898681226db955bdb8ac94f170e1dc3e74f8b558c2ceb730e7605ac35fc73b5842e0d904df0ae2e3d51ee04fbf566b5dbf2d59bd43bf08743c19ce6f99658973c1719b142d189fb98dfc8e9c28b062c3fc957a159c3d1bc452a221a97710e98614e38414ffa72fcb284bb616ac1a0fb5accdae7b49c2293d73b967218032ed2a23051f75adba6b7b051218d5ae80da4cbfb5936d389d2a6c53e91a4917f15303bec4a54bef1aed49d3c07d5fa730164287b2a8b14c3433fe7a81aa93a864118eccc8e9d34cf1a4db8b64eb4aeeb2dfda76203a4976dec96ca8a231bedbaa30c201192407fb9c494ab2010fc034abc72a7eeb129ff9ca236584c69b716548b5f75feb0101628c5fb99abb0c8f872fe7324a8434d4e96f0ae8194680452dca01cb9b062e4acbd887a2e0c7cc42d776934ff8ff068cc4a9ed51df3217874dbdfe87cdd499e3cf5c7b0e4a5dc05eea1e57cb2a0891e2b8ac90f6efd48c93506de579046f2c6a2fbd932630b1c81ebd6b0363879f40d79b8f0329f7935c9de646777dd232cbdd948670f3ffcceead3242f8f3534716bbd24d4da9534ecafed28d4f6bd2d669233b51c609eca07b1c197a5ec732ff99e8930902e93d280cd593a754572a388ae43c214b6aec81c268127492c7dbfe264146316d3ace7ce5a6f9337ad54a94754920e1cdcf8b6d8e05e4cf49689556a4c75116ffaeac140e31d399dfcb0ee0f6d79592571b893df4dc6e157458f1e9fdfa1331010b37e7d75d998b26bfe0c3876c884a0d77b350a2eee1c2ef49ca66f8f8363ef5e1c9cb0f52174c88b4b386e31fed36727f54ddb295928706f8fd02d6be45d479e1c84d7295bf23d81a792da422f9d310a735727925977554a08cea81dc9e2cf3f17bea92018560ac79962943f79790c4111f7b4f65ac413ff8826aa3c3228fe6e7822dc42e447996e5e67bf67769c44c60200e538d33aaec16ce5f58f43e5da31faf293b45db2f55a3944e5583e155c79fd4bfed65a1395f6e6cfa35920101440ac39d238a0dc729421be252a6a490640eba8d5d7225db92b3a451e12472fa6593ad23493c8c7f77687b18db3e14b3a8504a58f59b766d3a81091df8422505f23acca8d1dd289898c2a1a22594abe27aa0496f8c4aa44bfebd93cfb2fdeaca1235ad0ea3633b192b0ecebe999470bcdaac4f1fe6183535318bcac8eb0d82c65604b0142036e19de60f9c89fe074040994bfae16d004f90c54e35d4581998b7d89650c658e00ddba71d31ff76fe0f22e97174f8f8059d0135611f1290df03f00409245f85b388c7f9da6df847c44637c38404e8b312ccd031c4031d47d6f9caf0907699a8f52574b281fa7d5456ebb6b116131b7234d2cef149e91641c869b56131538542c46b62d236201babe257cafca724159a51338d0e1efda4fb6014c85ae9a69deca1fbfe8aae0b4b5f3012e0a9b2d3c24e89969c77f9ef310a69cf7b0975c8c5ea032da39ea3817f9aaf364f0dfbd8450ed446165711ddb706be4d4d6d883df0e4f051edd36935cfd085f4ea2449c859eb9101631cd6d4dfc37107e570b651f005d0c5b44f609f6afdae4effe4741de90b07f04804c4a29ce3ef4b70bcfad37e2feb4935b1060629db5a7119385e5765237269a2d2553d694daeb45211e4a3ac88da66a5bebb04784315f5b5431a30785a6f5b0b8a17c99a7cdfa1c771bde6a98db192a97971e6344c4ebecbd5c9dc45b254b6b247d0bc7faf55da251bf057b594cee9560013c97db1155e65f43e6730e52f89a8ded3ab1db0eb6b36f61d9b82c3398845f0d24e39bed40058353c209a056918ca47a51ad04597e5d7372f0311844a2f27aef29d2824e00c5ecb3360a3628ebe7785170b393585f2c7a561c539ab6fb11eced9ed3897c5c86b9c6df628a3830fdbee9c5d924cd668a6bc4880e8c4fa2310a187a38479066360db474d7698c9c68038324cfb778d158951c0bef01920fa54688bc22014394798b452fd91ab5caf83c74cbcd2c18b2ccecf4eb14e0629cca65c6fe65782d60e93ce2244d246f8ec968b6dd1df97447385b70df3336915d6516ff59b16eae87921b44d0654b5811b594316a6cd6b05c9911cb769a2f5e84a046c5b8aed64559ef4d9dc80b3476dcc0f1b36fef5764cd0ceaabef68ef6cc3101d1ba1d1bd80489d675acb1e4fbf8c601c235f9c3beedfeb53932cf0c8686914f734665ce5e0c0a6fdd8b19e3bc79737ec06b7d8ae4eb893b90f866d4fb65b816384398a19e7e7ff7f2b7e89e0925e6a56132e6443385937966b71440b1e6060cc46c732790e334dc02714e8bc5bc432931bac05df7d3688b6e248014cda8e63e70eba6d6502c3aff1981c8d6fe8a65b86a2e80ebfb2777a7289ac92f259d89aac49b9c74641a56912e9137d482949d52337fbe0fcfbd592055c073d8dd0164ca44d88fe605d223c663b5cbde2baaccde8d3abaf3541665fe759a190e2939fe88c15cbb0c0a94148fed8955b4eafdf42f9decfde0b9a1aac70ef3e55d259ac88f85b07bf6425317fc3bd97c0de42cb11943f1eadc28a128b7e356fbb79ad4c03212c6499904bbe9974c8e09c74e78e54181c9440f3953dfd276b089d75f2703dd29e9e93c385d3b8b74f5aeac1b4f065422a04c74a927695d52883607969d1f6bca661affbe9edf445fbfa4c69c06023c746e141b7fac85f9a0e455187a101a856655b8280f91355c2052181b273a20b361ba00c5296fe6a72ec8b8ebe29beccd3093c9ae2970b90641281ce0b951e874d02e98b22497759586eaa361067a93572e972939be5443dfd891f6ab13bb8d386c6b9c5ee23da8c07bc1da164996ab7cedd32e0f62006dd207ed42417b94176a4facf82be063465c509312b301c0165c028b7b017723f8b07eb03fa91f595a8cf28899f3dc3cf28b4b8edeb3f5c778ea9454f0ca9bc390ae5045ea4914ddddfcca43148160d312cb03fefc8b36df83e1461f31626f6151bd738e185464e245b3e9c91b8de7718077ed8e887a7246ad105fb5fcaab8dd8f4ee3de04d599d23f9202cd4195e75489cdc987ae42afce8c443c42e6f3abd5bd8184993950f2a12be1ed283a7c4ef7c468812eab7fad811ff7928a3f7158b387467ade978084b034414b707</script>
+  <div class="hbe hbe-content">
+    <div class="hbe hbe-input hbe-input-default">
+      <input class="hbe hbe-input-field hbe-input-field-default" type="password" id="hbePass">
+      <label class="hbe hbe-input-label hbe-input-label-default" for="hbePass">
+        <span class="hbe hbe-input-label-content hbe-input-label-content-default">当前文章暂不对外可见, 请输入密码后查看 !</span>
+      </label>
+    </div>
+  </div>
+</div>
+<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/private/" rel="tag"># private</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/06/13/OSEP-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="prev" title="OSEP 学习笔记 - Kiosk Breakouts">
+                  <i class="fa fa-angle-left"></i> OSEP 学习笔记 - Kiosk Breakouts
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Lei</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">118k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">7:10</span>
+  </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fancyapps-ui/5.0.31/fancybox/fancybox.umd.js" integrity="sha256-a+H7FYzJv6oU2hfsfDGM2Ohw/cR9v+hPfxHCLdmCrE8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"neutral","dark":"dark"},"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js","integrity":"sha256-stuqcu2FrjYCXDOytWFA5SoUE/r3nkp6gTglzNSlavU="}}</script>
+  <script src="/js/third-party/tags/mermaid.js"></script>
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
