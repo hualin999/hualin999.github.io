@@ -23,26 +23,26 @@
 
     <meta name="description" content="这是一篇加密文章, 需要密码才能继续阅读。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Maldev Academy 学习笔记 —— Module 20: Evading Microsoft Defender Static Analysis">
-<meta property="og:url" content="http://example.com/2024/10/21/Maldev-Academy-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E2%80%94%E2%80%94-Module-20-Evading-Microsoft-Defender-Static-Analysis/index.html">
+<meta property="og:title" content="Maldev Academy 学习笔记 —— Module 25: Maldev Academy Tool - MiniShell">
+<meta property="og:url" content="http://example.com/2024/10/23/Maldev-Academy-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E2%80%94%E2%80%94-Module-25-Maldev-Academy-Tool-MiniShell/index.html">
 <meta property="og:site_name" content="L&#39;s Hacker Life !">
 <meta property="og:description" content="这是一篇加密文章, 需要密码才能继续阅读。">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2024-10-21T10:12:36.000Z">
-<meta property="article:modified_time" content="2024-10-21T10:20:33.429Z">
+<meta property="article:published_time" content="2024-10-23T15:05:09.000Z">
+<meta property="article:modified_time" content="2024-10-23T15:26:02.588Z">
 <meta property="article:author" content="5!nK130@T">
 <meta property="article:tag" content="private">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://example.com/2024/10/21/Maldev-Academy-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E2%80%94%E2%80%94-Module-20-Evading-Microsoft-Defender-Static-Analysis/">
+<link rel="canonical" href="http://example.com/2024/10/23/Maldev-Academy-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E2%80%94%E2%80%94-Module-25-Maldev-Academy-Tool-MiniShell/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2024/10/21/Maldev-Academy-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E2%80%94%E2%80%94-Module-20-Evading-Microsoft-Defender-Static-Analysis/","path":"2024/10/21/Maldev-Academy-学习笔记-——-Module-20-Evading-Microsoft-Defender-Static-Analysis/","title":"Maldev Academy 学习笔记 —— Module 20: Evading Microsoft Defender Static Analysis"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2024/10/23/Maldev-Academy-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E2%80%94%E2%80%94-Module-25-Maldev-Academy-Tool-MiniShell/","path":"2024/10/23/Maldev-Academy-学习笔记-——-Module-25-Maldev-Academy-Tool-MiniShell/","title":"Maldev Academy 学习笔记 —— Module 25: Maldev Academy Tool - MiniShell"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Maldev Academy 学习笔记 —— Module 20: Evading Microsoft Defender Static Analysis | L's Hacker Life !</title>
+<title>Maldev Academy 学习笔记 —— Module 25: Maldev Academy Tool - MiniShell | L's Hacker Life !</title>
   
 
 
@@ -142,7 +142,7 @@
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
             <div id="toc-div" style="display:none">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Code-Samples"><span class="nav-number">2.</span> <span class="nav-text">Code Samples</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Raw-Shellcode"><span class="nav-number">3.</span> <span class="nav-text">Raw Shellcode</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#XOR-Encryption"><span class="nav-number">4.</span> <span class="nav-text">XOR Encryption</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RC4-Encryption"><span class="nav-number">5.</span> <span class="nav-text">RC4 Encryption</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AES-Encryption"><span class="nav-number">6.</span> <span class="nav-text">AES Encryption</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Features"><span class="nav-number">2.</span> <span class="nav-text">Features</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Usage"><span class="nav-number">3.</span> <span class="nav-text">Usage</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Examples"><span class="nav-number">4.</span> <span class="nav-text">Examples</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Demo"><span class="nav-number">5.</span> <span class="nav-text">Demo</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -210,7 +210,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/21/Maldev-Academy-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E2%80%94%E2%80%94-Module-20-Evading-Microsoft-Defender-Static-Analysis/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/23/Maldev-Academy-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E2%80%94%E2%80%94-Module-25-Maldev-Academy-Tool-MiniShell/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/Vergil.png">
@@ -223,12 +223,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Maldev Academy 学习笔记 —— Module 20: Evading Microsoft Defender Static Analysis | L's Hacker Life !">
+      <meta itemprop="name" content="Maldev Academy 学习笔记 —— Module 25: Maldev Academy Tool - MiniShell | L's Hacker Life !">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Maldev Academy 学习笔记 —— Module 20: Evading Microsoft Defender Static Analysis
+          Maldev Academy 学习笔记 —— Module 25: Maldev Academy Tool - MiniShell
         </h1>
 
         <div class="post-meta-container">
@@ -240,7 +240,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2024-10-21 18:12:36 / Modified: 18:20:33" itemprop="dateCreated datePublished" datetime="2024-10-21T18:12:36+08:00">2024-10-21</time>
+      <time title="Created: 2024-10-23 23:05:09 / Modified: 23:26:02" itemprop="dateCreated datePublished" datetime="2024-10-23T23:05:09+08:00">2024-10-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -259,7 +259,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>216</span>
+      <span>240</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
@@ -277,7 +277,7 @@
     
     
     <div class="post-body" itemprop="articleBody"><div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="抱歉, 您输入的密码错误, 请检查后重新输入!" data-whm="抱歉, 当前文章不能被校验, 不过您还是可以看看解密后的内容。">
-  <script id="hbeData" type="hbeData" data-hmacdigest="e55e6472e135a361e16d5d7b717350d03551763aa74574dc66db3c6aa5f400b6">d0732a6c3cda67378be25ffb83735163524ffdfcbb2ad8d421e17a0272dbc64ae5819b433aa10fd2d41880143089985279c753a68836ba3fd6f6814b2fe1365e238c605800f5f9540233438e965cce5b47a3676444910e7023f4f61e174ebf5d8576949c050da4d89f896239a3b59e71059bed036523295ff56f5c4d266776256a512b913e212ad10bae8c6e73a3562db0b677ac8033ecbc0e091394ce98fa16e128306d2148a4260ed712e71f04bda0fef8c5f7d0b6ee5575ce80f367ab333404a0c3aaa86c32125839d11a4beac93224f7fb25ad7c745f74166aabc747ca2a8eec8c0026026332275c125d3f4493533be9dc76991f9f79c58fecf5bbcf127e7bc055323b0bf2fd9dfdf5d643b19128819b7be15688f2adc09b07c78d894375cb5b5623b3a70465694a5a9e7ceaed812b214f7fda1e3d90f3dd2fcdc99b8600a2c9f6ce9fedf37eb663c51132487bea0c48a74c68adc2ac60a97c417af76468b0e85a7e8c80d36c5ca1881293521f0d54dfab8fc570eff1e4c8f65e504092cfdb899741e7311f48615774f89fc1c85ea398783ebe1d604064eff97077554c3f6abcfabf5f6f85ab134710baa720fb45c711f00be73e355fb33bd7f75b59553c0a7aad00abb0dbf3a534316a30c014dd7d4168595178bebcdc15ecffc5428b5a524d6508c61ef35c16cafc2d566dabb239c6b4cb0eb0a4047e04d0eb3592324b14d3da9c99883067a193fa1c86bb59457ae189b8960ce84adbb3b459588f6c8ff8698c96f684fdc16adc36f4b774001d56bb0dafa1a851e39aea8a5b238d2490a7f36397bbf024f42b7d1fc2c549fe241e6ffd56137caefe4cd2795c252ac275d3503310a3c8902d0b4eefc08de4e18365c264c3a8f6420f8878b57efe9116fa93a49c18b78ae8dd3d5392c5409c133fd68c03d733143278a7d294e3dfd97e768e7027188adb428849ae45e72d682801343e191acacf80f4aab814be4f061d85fbbd4ce338a00c3b8d6cf23cbda1272240a15188f3a0e85c1f5ba3bd7c7d21859b1281847059a8964466e4994141841e2571b3b692ba9901bfda18c5afc7bcae875b8c6b9bf182bcb370da5fa2d7e8ca58d29f11d6e42a66cd8bfe957468b60733021ccbb42d803c29099330e88383a66db6f22aebe185d19dcb79fecfef413a344b77717d844d1cc7e1f131547227adf1a05248bf7cc26700643c82480989b23dbb70bce698699593aae247cef86235d3c88e165c48afd44e3f45031e925a2ecf7de6398732c52a9c8f86fa78dfef1384ca2838adff11f7748d40a26ffd2e84bd9e8ec99414b6033d54263fc3625ab2d25265023f244d46129dba9dcf25d785358a04d266b208628f67a112ae8dd4473c6b616ec015900d5381bd48ee171c12c9832727c32a4978aa92b851d73411dba2f571b434c43d9d08c18315af38fcea308dbefb1c14c5e357fef8bdcd95f668c6395eb36fd22a4231cd43114bfe2b3e72071322bca53a835f3793127ea64fda12fed3081c468ce94bc4161298ee280c01e8ac51b322fa7f371a2f02f6b365c3cf07b98689574a914abd34c024fc06a106e11cc01dc5acecd3c8c38f85a129e7a9ef5d9a9ccc05b1b8d736aaa968ffe45c2968718080d47eb3449a460fb390bff68bbcefb98d1808e211fd09be3230f3ff35e4949ac1b5fcbad9b3c3c065da77bb8a926501e592f44f516d5a6154363e6ddf3fd567fa2f8d7b5823b1d14babc054031520d1c727cabd8a1e4a544dde55e8d1d781c6c8f15a3f7a87b005d88130f3844ba02a865ab05c722de7babbd93e8b2a5a289c2dcf9bd57ca0090c15f53a1ef4aa67cf7e4d5f8ad5821a7e94031398fc1424d4025a732a93095d2a4949a11a2f0f570dbf6ab063340b7f3c7f55774a767dc850c881259712339492eb9cf48321ecc56acf6fd22a551f266936422e661cfa3b2fb2a00579ed675b1e9440cb1d969a506f64f2fc590be936bc4112351c0e13a8f58dc7ab1b260b1ca4c75d8481103ad762df2d567aa790c47a98a77d982efdb082dcb00d627c42b4700a144255a2cad88dc283d6d7f268f6fb0402adc4947d6c68f0f1e67308c0f3cf451d4d97cfb518b338cfb7a9f033ebf06c57eb8ab1826053db9e20efe04f73b8f96d8bb5569f7292f3660a094895cf5231ead2d166c5b654d337e27b188d95ac879d6d9e2f9b3f4a1875c47fa3fb9de1e57e396068c44332aee3ff55e047cb5b494e647c4b7a38bc4ff6f163d0ff5562fd7c8b75d0bf2e5ee67293719870c826272ea4bd96a6afa41ef824fa267b04fc0013e7d5776d9abd7b6a671802dcc063ce9ae6bb75caa9d37eab86bb9ed338b7f539ac1d4535c239b9914b4f4f9103dda80cbdf75ef94364e47cf59718243c3c6708b387c579d23d766399b2d5181fbeee47ac5928d6b2d9df7b039ed553ec0331b36cf2060844f32d6cf005f85766374fa418beb805c9720a11083f046431a190b40273ac4c439ddffae174914f598424b3f75cd06fb884d6d231a288426533f646e2ff318f48c83dee8496a70714de809ca17befc3f92719f26fe61c8371c4848b8e903dbcf4f0c7d62c533a1f077e684dd4ff4944be1206c3d0f4d9f1689c887d854e9e553549010b7ffbb93dd3d665d95badf6b279e1303b9452408aa2ec1aee482609ba28976e1d991400200947daa5835cdeeef67ef89c77ed02d452a726263fe3db22a1f3ef3e538619ad4b5cb221e5</script>
+  <script id="hbeData" type="hbeData" data-hmacdigest="f68eb6d8bb822e16678731800cd0fcc2fbfb758a12efc68a54f759f34856418a">d0732a6c3cda67378be25ffb83735163524ffdfcbb2ad8d421e17a0272dbc64ae5819b433aa10fd2d41880143089985279c753a68836ba3fd6f6814b2fe1365e238c605800f5f9540233438e965cce5b47a3676444910e7023f4f61e174ebf5d8576949c050da4d89f896239a3b59e71059bed036523295ff56f5c4d266776258c20d285e62644b6fd97a782adab6f69da173fc55545d4118a73f193a56604fc00dde4bee31b9262c38a1c82f73ddb0614c92238d50646f25cd3d2d000c969680e7ea372481cda30198eb8b30e87d67015d8fd7ca3872fe100836ea55db8a434dc6226dcc08c44b149b83a33aa375f5ce220728a71d3b85c20f99a7e6d9444522318189921bcc17200cea040375b0e7d94695057c239aa14b6e4f5ea33e80f1059767e64b6de1444d2b1a7d9f35fb52b95ceeb56293b71a4013f1c2cae56e636d5bfee89caef1bee08de598b931d3c447bfff9265f1cc0edf96e199e7bce507a254ca91cc0ebf6ac7bcdfdffff86fa0e6b269b1622e9330cd46793c54559c5430d4e5839a29a7f929ad1609c88079b79b04e4fc93059f7c837718320e078512173b74b22b41cbc5780b8feab6205d3b686621e503856c67028d271dcab36c301fce94adc989cda86a0a73e6e829d95c37bb941f06bbf98c6705582f5b9166a8ef6e67707e4320de34ffb2ffe2c9fd71145ca52e0b4dc2f8abc290c4396011122ea431663ef60f4e8126b68c9663fa3a1a2063691542ec71aa096c4ae88b150833d9a7b6bf5e081168bd50d35ebd474444a6f37b653489a6d118842e14e5eab46a723620f2a629a3ed362ede15ea6e3e810c75150939b22c841b9945efce1ce52c9526b200ad5b3d6cfd72b3d8bc7384f75c5775d1026d0256dd6d8949f469b1ad82c10514601fbd1af4a8db931814c2ba7e8f218ce9db2e7951d4e18db474fa754a828238a3538f2d305729cd251c63939f801e5b1f54abcd74aa91a7fa5560c6e523a446f95a57e4957067601f8bcd81a26236e9fceadbd2638a54fd605d468fda94c55639d4f04856a5bc7455a6f6f03c6fe36f94255e25443e1367638ba675ebd8f9a5e4786f2d58c5ab74735d1b28bb6c02733f776ed711b2c0ec2f3f704ca435e0f10b6df71a074d15b7b989eb3feafbc3bf11ad90fd7732a524c856e703f5e7a5a8524a45b22f879533b637dcdbcccf5af27160e325072fe3fd9a801375f1a8650c481f83f259a12f3c3b20d95c398a62b8a9e5f7d01de397ffd3bfeec58a0bbf3befa093520c6c5809289a89ef80c579c4a235593e620ed1e282cecc1ab2700d019f767e37349bfeddfd96a4da28e5658c6c59781f918ffe6eac730144ce8ad0e0f992e9ee7c638a997e9dc34499986eab4b6ddbf3b5b5ba9a3c1cb70c79c9fce61d67538e88f3d0dedab3804dd9469afc21157174f82acc73219068a1939bb2aacd21faa4791432160c8d2e6dacbb4ec02b93d149328f54fe6cb3e6ed9527b799eb0bd5ea446b206b3994ac0a4887decf657aad82ac0cfc00ba9e53e2c977fedf2cb8c8302f15ab2b9a804c7ca283c26220d44fc7c897c83f4b6d13573beb3b58e27bf3392cb9e9d4f2829a0ad094a076b27ee477fdf602b261945be536119a3fd6b911fa5eaa26a3d8cc91417ba22cf9e232fe055d4b7776f07407abb3cdaef80dab23ee8750a479e8b83a76799404566457e98a39e8d075cb6a0e01a639cdcba50ed7ea18f09ef6c87da5847c8570efd4f9c18c703aa919a7d90757027d09e835b280e49a7594121c6fd41f83d46ea9b7258b3d9f35566ae32df1415f3f7858b53b9f1b446a7cb46efcfa9c4dadea3bdf82036a42240dc6c5567658f715d3d63dd363b7091c139174b4047655608a814f50376e84bcf0ea64564539ec1dffabd428d5a5d5efca00ce5f4de233cd1aaa772949c3fe63df9ea53b197a79ccc2b731407ad72f00bb37b0a6dc545b34668873b3608c3666ef92f29abfb9c59571ce740f555fa79f2a7ab559dba739feb4a57d130bac96ab590b79acb66ba06609304d2c8999ffc8157d9b919c8655339c6ca9c59e0f8c9eea9b9a9539b5269b6072fef0d6e1659fe55715a6e54460920a67fc5e5aea246fd1e28e985f05ea0fd4d92b81daa5e5c2714d4f6834805bf9cf9d418c582e91e6928a3b7d87ce57881d7c38286a546c3c77aababc90bde0509e0d7f1127a43bb016a35630e4f351593d4a36db4a7308904465db14bc9e2dd1cccc61e298596f5001267296fb40cd91771a422b0e7e074e2051cd5e273bf08019dd27b4b2eefc34c19c0b4ff9080308b6fb212c9e4acca432546bdce05539e63211e6e553828c04b9cd15463c08841546b3cc6e1bb5f68d5e1225cc06b327a17700119142641ff628ef59b4a24f5aae736adddec3c11ab99520912b982dde07020b9edb324a1ed39b27ced559b5c84ce6f7f3b80a7ba7905dcabc720ff95f096909bca4186352508d08973af4279f9e67585d6fcf9ac07a0104b0d7f80df38fe11778fe962c13e0aeb3c7e6bd7d19be6c79cf575bfcac644d98d51a8f14d7f6eba1690b8c2b436fb52f35b1262f3610cc6fb93c35494ae7418c594b001953764f6f127c03126bdd57791ff96a3a3ab042e5eb890c762a0530d6bc831de08e5eaa1bddc3287428ed6d98a48abcfdde3631c0cde09e3a388fbe7388c57e7a2d627d5267b818778fa4d3cb7d4048b9de7bfcdd4ff9383a89f651446e318eee39ecadf4d9895d96aa55b7d5c14c21d</script>
   <div class="hbe hbe-content">
     <div class="hbe hbe-input hbe-input-default">
       <input class="hbe hbe-input-field hbe-input-field-default" type="password" id="hbePass">
@@ -303,14 +303,11 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2024/10/21/Maldev-Academy-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E2%80%94%E2%80%94-Module-19-Payload-Encryption-AES-Encryption/" rel="prev" title="Maldev Academy 学习笔记 —— Module 19: Payload Encryption - AES Encryption">
-                  <i class="fa fa-angle-left"></i> Maldev Academy 学习笔记 —— Module 19: Payload Encryption - AES Encryption
+                <a href="/2024/10/23/Maldev-Academy-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E2%80%94%E2%80%94-Module-24-Maldev-Academy-Tool-HellShell/" rel="prev" title="Maldev Academy 学习笔记 —— Module 24: Maldev Academy Tool - HellShell">
+                  <i class="fa fa-angle-left"></i> Maldev Academy 学习笔记 —— Module 24: Maldev Academy Tool - HellShell
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2024/10/22/Maldev-Academy-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E2%80%94%E2%80%94-Module-21-Payload-Obfuscation-IPv4-IPv6Fuscation/" rel="next" title="Maldev Academy 学习笔记 —— Module 21: Payload Obfuscation - IPv4/IPv6Fuscation">
-                  Maldev Academy 学习笔记 —— Module 21: Payload Obfuscation - IPv4/IPv6Fuscation <i class="fa fa-angle-right"></i>
-                </a>
             </div>
           </div>
     </footer>
